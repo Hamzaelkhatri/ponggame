@@ -21,7 +21,7 @@
 </head>
 
 <body>
-    
+
     <!-- center canvas element with div -->
     <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
         <canvas id="canvas" width="600" height="400">
@@ -36,22 +36,57 @@
 
         console.log(width);
         console.log(height);
-        ctx.beginPath();
-        ctx.fillStyle = 'white';
-        ctx.fillRect(10, (height/2) - (90/2), 10, 80);
-        ctx.closePath();
 
-        ctx.beginPath();
-        ctx.fillStyle = 'white';
-        ctx.fillRect(width -20, (height/2) - (90/2), 10, 80);
-        ctx.closePath();
+        function right_hand() {
+            ctx.beginPath();
+            ctx.fillStyle = 'white';
+            ctx.fillRect(10, (height / 2) - (90 / 2), 10, 80);
+            ctx.closePath();
+        }
 
-        ctx.beginPath();
-        ctx.fillStyle = 'white';
-        ctx.fillRect((width/2), 0, 10, height);
-        console.log(ctx.position);
-        ctx.closePath();
-    
+        function left_hand() {
+            ctx.beginPath();
+            ctx.fillStyle = 'white';
+            ctx.fillRect(width - 20, (height / 2) - (90 / 2), 10, 80);
+            ctx.closePath();
+        }
+
+        function fixed_line() {
+            ctx.beginPath();
+            ctx.fillStyle = 'white';
+            ctx.fillRect((width / 2), 0, 1, height);
+            console.log(ctx.position);
+            ctx.closePath();
+        }
+
+        var x = width / 2;
+        var y = height - 30;
+
+        var dx = 2;
+        var dy = -2;
+        function ball()
+        {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, Math.PI * 2, false);
+            ctx.fillStyle = "white";
+            ctx.fill();
+            ctx.closePath();
+        }
+        function draw() {
+            
+            ball();
+            right_hand();
+            left_hand();
+            fixed_line();
+            x += dx;
+            y += dy;
+        }
+
+        var speed = 10;
+        setInterval(draw, speed);
+
+
     </script>
 
 </body>
