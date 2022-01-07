@@ -34,23 +34,26 @@
         var width = canvas.width;
         var height = canvas.height;
 
-        console.log(width);
-        console.log(height);
-        var paddleHeight = 10;
-        var paddleHeight = 75;
-        var paddleY = (height - paddleHeight) / 2;
+        // console.log(width);
+        // console.log(height);
+        var LeftpaddleHeight = 75;
+        var LeftpaddleY = (height - LeftpaddleHeight) / 2;
+
+
+        var RightpaddleHeight = 75;
+        var RightpaddleY = (height - RightpaddleHeight) / 2;
 
         function right_hand() {
             ctx.beginPath();
             ctx.fillStyle = 'white';
-            ctx.fillRect(10, paddleY, 10, 80);
+            ctx.fillRect(10, RightpaddleY, 10, 80);
             ctx.closePath();
         }
 
         function left_hand() {
             ctx.beginPath();
             ctx.fillStyle = 'white';
-            ctx.fillRect(width - 20, (height / 2) - (90 / 2), 10, 80);
+            ctx.fillRect(width - 20,LeftpaddleY, 10, 80);
             ctx.closePath();
         }
 
@@ -104,42 +107,74 @@
             }
         }
 
-        var UpPressed = false;
-        var DownPressed = false;
+        var Left_UpPressed = false;
+        var Left_DownPressed = false;
+
+        var Right_UpPressed = false;
+        var Right_DownPressed = false;
 
         document.addEventListener("keydown", keyDownHandler, false);
         document.addEventListener("keyup", keyUpHandler, false);
 
         function keyDownHandler(e) {
             if (e.key == "Up" || e.key == "ArrowUp") {
-                UpPressed = true;
+                Left_UpPressed = true;
             }
             else if (e.key == "Down" || e.key == "ArrowDown") {
-                DownPressed = true;
+                Left_DownPressed = true;
+            }
+            
+            console.log(e.key);
+            if (e.key == "w" || e.key == "KeyW") {
+                Right_UpPressed = true;
+            }
+            else if (e.key == "s" || e.key == "KeyS") {
+                Right_DownPressed = true;
             }
         }
 
         function keyUpHandler(e) {
             console.log(e.key);
             if (e.key == "Up" || e.key == "ArrowUp") {
-                UpPressed = false;
+                Left_UpPressed = false;
             }
             else if (e.key == "Down" || e.key == "ArrowDown") {
-                DownPressed = false;
+                Left_DownPressed = false;
+            }
+            if (e.key == "w" || e.key == "KeyW") {
+                Right_UpPressed = false;
+            }
+            else if (e.key == "s" || e.key == "KeyS") {
+                Right_DownPressed = false;
             }
         }
 
         function key_hook() {
-            if (DownPressed ){
-                paddleY += 5;
-                if (paddleY + paddleHeight > canvas.height) {
-                    paddleY = canvas.height - paddleHeight;
+            if (Left_DownPressed) {
+                LeftpaddleY += 5;
+                if (LeftpaddleY + LeftpaddleHeight > canvas.height) {
+                    LeftpaddleY = canvas.height - LeftpaddleHeight;
                 }
             }
-            else if (UpPressed) {
-                paddleY -= 5;
-                if (paddleY < 0) {
-                    paddleY = 0;
+            else if (Left_UpPressed) {
+                LeftpaddleY -= 5;
+                if (LeftpaddleY < 0) {
+                    LeftpaddleY = 0;
+                }
+            }
+
+            //
+
+            if (Right_DownPressed) {
+                RightpaddleY += 5;
+                if (RightpaddleY + RightpaddleHeight > canvas.height) {
+                    RightpaddleY = canvas.height - RightpaddleHeight;
+                }
+            }
+            else if (Right_UpPressed) {
+                RightpaddleY -= 5;
+                if (RightpaddleY < 0) {
+                    RightpaddleY = 0;
                 }
             }
 
