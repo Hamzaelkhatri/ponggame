@@ -46,17 +46,37 @@ var dy = -2;
 var init_angle = 0;
 var ballradius = 6;
 function ball() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
     ctx.arc(x, y, ballradius, init_angle, Math.PI * 2, true);// 20PI
     ctx.fillStyle = "white";
     ctx.fill();
     ctx.closePath();
 }
-// function angleReflect(incidenceAngle, surfaceAngle) {
-//     var a = surfaceAngle * 2 - incidenceAngle;
-//     return a >= 360 ? a - 360 : a < 0 ? a + 360 : a;
-// }
+
+function miniball() {
+    ctx.beginPath();
+    // random color
+    var r = Math.floor(Math.random() * 255);
+    var g = Math.floor(Math.random() * 255);
+    var b = Math.floor(Math.random() * 255);
+    ctx.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+    // random x and y 
+    var x = Math.floor(Math.random() * width);
+    var y = Math.floor(Math.random() * height);
+    // var radius = ;
+    ctx.arc(x, y, 2, 0, Math.PI * 2, true);
+    ctx.fill();
+    ctx.closePath();
+}
+
+function animate() {
+    var i = 0;
+    while (i < 10) {
+        miniball();
+        i++;
+    }
+}
+
 
 var left_score = 0;
 var right_score = 0;
@@ -80,7 +100,7 @@ function manage_ball() {
             dx = -dx;
             // alert("Right Paddle");
         }
-        else if (x + dx + 20 > canvas.width) {
+        else if (x + dx > canvas.width) {
             speed = 0;
             right_score++;
             x = width / 2;
@@ -88,14 +108,14 @@ function manage_ball() {
         }
     }
     if (x + dx < 20) {
-        if (y > LeftpaddleY && y < LeftpaddleY + LeftpaddleHeight) {
+        if (y > LeftpaddleY && y < LeftpaddleY + LeftpaddleHeight || x + dx < 0) {
             // dy = -dy;
             dx = -dx;
             // alert("Left Paddle");
         }
-        else if (x + dx < 20) {
+        else if (x + dx < 10) {
             left_score += 1;
-      
+
             x = width / 2;
             y = height / 2;
 
@@ -148,6 +168,11 @@ function keyUpHandler(e) {
         Left_DownPressed = false;
 
     }
+
+    if(e.keyCode == 32){
+       pause = !pause;
+    }
+
 }
 
 function key_hook() {
@@ -158,7 +183,7 @@ function key_hook() {
         }
     }
     else if (Left_UpPressed) {
-        LeftpaddleY -= 5;
+        LeftpaddleY -= 3;
         if (LeftpaddleY < 0) {
             LeftpaddleY = 0;
         }
@@ -171,7 +196,7 @@ function key_hook() {
         }
     }
     else if (Right_UpPressed) {
-        RightpaddleY -= 5;
+        RightpaddleY -=3;
         if (RightpaddleY < 0) {
             RightpaddleY = 0;
         }
@@ -190,19 +215,25 @@ function score() {
     ctx.font = "30px Comic Sans MS";
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
-    ctx.fillText(left_score, width-30, 30);
+    ctx.fillText(left_score, width - 30, 30);
 }
+var pause = false;
 
 function draw() {
-    manage_ball();// manage ball movement
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    fixed_line();
+    left_hand();
     ball();
     right_hand();
-    left_hand();
-    fixed_line();
-    key_hook();
-    x += dx;
-    y += dy;
     score();
+    animate();
+    manage_ball();// manage ball movement
+    if (pause == false) {
+        key_hook();
+        x += dx;
+        y += dy;
+    }
 }
 
 
