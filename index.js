@@ -98,6 +98,10 @@ function manage_ball() {
         if (y > RightpaddleY && y < RightpaddleY + RightpaddleHeight) {
             // dy = -dy;
             dx = -dx;
+            dx *= 1.5;
+            if (dx >8) {
+                dx /= 2;
+            }
             // alert("Right Paddle");
         }
         else if (x + dx > canvas.width) {
@@ -105,19 +109,26 @@ function manage_ball() {
             right_score++;
             x = width / 2;
             y = height / 2;
+            dx = 2;
         }
     }
     if (x + dx < 20) {
         if (y > LeftpaddleY && y < LeftpaddleY + LeftpaddleHeight || x + dx < 0) {
             // dy = -dy;
             dx = -dx;
+            dx *= 1.5;
+            if (dx > 8) {
+                dx = dx / 2;
+            }
             // alert("Left Paddle");
         }
         else if (x + dx < 10) {
             left_score += 1;
-
+            dx = 2;
             x = width / 2;
             y = height / 2;
+
+
 
         }
     }
@@ -169,34 +180,34 @@ function keyUpHandler(e) {
 
     }
 
-    if(e.keyCode == 32){
-       pause = !pause;
+    if (e.keyCode == 32) {
+        pause = !pause;
     }
 
 }
 
 function key_hook() {
     if (Left_DownPressed) {
-        LeftpaddleY += 5;
+        LeftpaddleY += 4;
         if (LeftpaddleY + LeftpaddleHeight > canvas.height) {
             LeftpaddleY = canvas.height - LeftpaddleHeight;
         }
     }
     else if (Left_UpPressed) {
-        LeftpaddleY -= 3;
+        LeftpaddleY -= 4;
         if (LeftpaddleY < 0) {
             LeftpaddleY = 0;
         }
     }
 
     if (Right_DownPressed) {
-        RightpaddleY += 5;
+        RightpaddleY += 4;
         if (RightpaddleY + RightpaddleHeight > canvas.height) {
             RightpaddleY = canvas.height - RightpaddleHeight;
         }
     }
     else if (Right_UpPressed) {
-        RightpaddleY -=3;
+        RightpaddleY -= 4;
         if (RightpaddleY < 0) {
             RightpaddleY = 0;
         }
@@ -220,7 +231,7 @@ function score() {
 var pause = false;
 
 function draw() {
-    
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     fixed_line();
     left_hand();
