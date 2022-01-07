@@ -36,11 +36,14 @@
 
         console.log(width);
         console.log(height);
+        var paddleHeight = 10;
+        var paddleHeight = 75;
+        var paddleY = (height - paddleHeight) / 2;
 
         function right_hand() {
             ctx.beginPath();
             ctx.fillStyle = 'white';
-            ctx.fillRect(10, (height / 2) - (90 / 2), 10, 80);
+            ctx.fillRect(10, paddleY, 10, 80);
             ctx.closePath();
         }
 
@@ -86,9 +89,9 @@
             if (y + dy > canvas.height || y + dy < 0) { // if ball hits the top or bottom
                 dy = -dy;
             }
-            // if (x + dx > canvas.width || x + dx < 0) { // if ball hits the right or left
-            //     dx = -dx;
-            // }
+            if (x + dx > canvas.width || x + dx < 0) { // if ball hits the right or left
+                dx = -dx;
+            }
 
             if (y + dy > canvas.height || y + dy < 0) { // if ball hits the top or bottom
                 dy = -dy;
@@ -100,13 +103,55 @@
                 dy = -dy;
             }
         }
-        function draw() {
 
+        var UpPressed = false;
+        var DownPressed = false;
+
+        document.addEventListener("keydown", keyDownHandler, false);
+        document.addEventListener("keyup", keyUpHandler, false);
+
+        function keyDownHandler(e) {
+            if (e.key == "Up" || e.key == "ArrowUp") {
+                UpPressed = true;
+            }
+            else if (e.key == "Down" || e.key == "ArrowDown") {
+                DownPressed = true;
+            }
+        }
+
+        function keyUpHandler(e) {
+            console.log(e.key);
+            if (e.key == "Up" || e.key == "ArrowUp") {
+                UpPressed = false;
+            }
+            else if (e.key == "Down" || e.key == "ArrowDown") {
+                DownPressed = false;
+            }
+        }
+
+        function key_hook() {
+            if (DownPressed ){
+                paddleY += 5;
+                if (paddleY + paddleHeight > canvas.height) {
+                    paddleY = canvas.height - paddleHeight;
+                }
+            }
+            else if (UpPressed) {
+                paddleY -= 5;
+                if (paddleY < 0) {
+                    paddleY = 0;
+                }
+            }
+
+        }
+
+        function draw() {
             manage_ball();// manage ball movement
             ball();
             right_hand();
             left_hand();
             fixed_line();
+            key_hook();
             x += dx;
             y += dy;
         }
