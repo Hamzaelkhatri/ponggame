@@ -3,7 +3,8 @@
     margin: 0;
 }
 
-canvas {
+canvas
+{
      /* hex #2C2C54 */
     background : rgb(44, 44, 84);
     display: block;

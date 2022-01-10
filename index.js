@@ -5,11 +5,11 @@ var height = canvas.height;
 
 // console.log(width);
 // console.log(height);
-var LeftpaddleHeight = 75;
+var LeftpaddleHeight = 80;
 var LeftpaddleY = (height - LeftpaddleHeight) / 2;
 
 
-var RightpaddleHeight = 75;
+var RightpaddleHeight = 80;
 var RightpaddleY = (height - RightpaddleHeight) / 2;
 
 function left_hand() {
@@ -71,7 +71,8 @@ function miniball() {
 
 function animate() {
     var i = 0;
-    while (i < 10) {
+    while (i < 10) 
+    {
         miniball();
         i++;
     }
@@ -82,7 +83,6 @@ var left_score = 0;
 var right_score = 0;
 
 function manage_ball() {
-
 
     if (y + dy < 0) {// if ball hits the top
         dy = -dy;
@@ -128,9 +128,6 @@ function manage_ball() {
             dx = -dx;
             x = width / 2;
             y = height / 2;
-
-
-
         }
     }
 }
@@ -187,7 +184,8 @@ function keyUpHandler(e) {
 
 }
 
-function key_hook() {
+function key_hook()
+ {
     if (Left_DownPressed) {
         LeftpaddleY += 4;
         if (LeftpaddleY + LeftpaddleHeight > canvas.height) {
