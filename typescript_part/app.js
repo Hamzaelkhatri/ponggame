@@ -10,12 +10,19 @@ class Game {
         this.Right_DownPressed = false;
         this.Left_UpPressed = false;
         this.Left_DownPressed = false;
+        this.Pause = false;
         this.Player1 = new Player(10, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0);
         this.Player2 = new Player(this.canvas.width - 20, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0);
-        this.ball = new Ball(this.canvas.width / 2, this.canvas.height / 2, 6, "white", this.ctx, this.canvas);
+        this.ball = new Ball(this.canvas.width / 2, this.canvas.height / 2, 6, "white", this.ctx, this.canvas, this.Player1, this.Player2);
         document.addEventListener("keydown", this.keyDownHandler.bind(this), false);
         document.addEventListener("keyup", this.keyUpHandler.bind(this), false);
         this.start();
+    }
+    show_score() {
+        this.ctx.font = "16px Arial";
+        this.ctx.fillStyle = "white";
+        this.ctx.fillText(this.Player1.Score.toString(), this.canvas.width / 2 - 50, 20);
+        this.ctx.fillText(this.Player2.Score.toString(), this.canvas.width / 2 + 50, 20);
     }
     keyDownHandler(e) {
         if (e.key == "Up" || e.key == "ArrowUp") {
@@ -29,6 +36,9 @@ class Game {
         }
         else if (e.key == "s" || e.key == "KeyS") {
             this.Left_DownPressed = true;
+        }
+        if (e.key == "p" || e.key == "KeyP" || e.key == "P" || e.key == " " || e.key == "Space") {
+            this.Pause = !this.Pause;
         }
     }
     keyUpHandler(e) {
@@ -65,46 +75,116 @@ class Game {
     update() {
         this.clear();
         this.draw();
-        this.ControleGame();
-        this.ball.move();
+        this.show_score(); // show score
+        if (!this.Pause) {
+            this.ControleGame();
+            this.ball.move();
+            this.ball.collision(this.Player1, this.Player2);
+            this.ball.bot(this.Player1);
+            // this.ball.bot(this.Player2);
+        }
+        else
+            this.paused();
         requestAnimationFrame(() => this.update());
     }
     clear() {
         this.ctx.clearRect(0, 0, this.width, this.height);
     }
-    manage_ball() {
+    center_line() {
+        this.ctx.fillStyle = "white";
+        this.ctx.fillRect(this.canvas.width / 2, 0, 2, this.canvas.height);
+    }
+    paused() {
+        this.ctx.font = "30px Arial";
+        this.ctx.fillStyle = "white";
+        this.ctx.fillText("PAUSE", this.canvas.width / 2 - 50, this.canvas.height / 2);
     }
     draw() {
+        this.center_line();
         this.Player1.draw();
         this.Player2.draw();
         this.ball.draw();
     }
 }
 class Ball {
-    constructor(x, y, radius, color, ctx, Canvas) {
+    constructor(x, y, radius, color, ctx, Canvas, Player1, Player2) {
         this.x = x;
         this.y = y;
         this.radius = radius;
-        this.color = color;
+        this.color = "rgb(" + Math.floor(Math.random() * 255 + 80) + "," + Math.floor(Math.random() * 255 + 80) + "," + 50 + Math.floor(Math.random() * 255 + 80) + ")";
         this.speed = 5;
         this.ctx = ctx;
+        ;
         this.ballradius = radius;
         this.canvas = Canvas;
-        this.dx = -2;
-        this.dy = 2;
+        this.dx = -this.speed;
+        this.dy = this.speed;
+        this.Player1 = Player1;
+        this.Player2 = Player2;
         this.draw();
+    }
+    goal_sound() {
+        var sound = new Audio("goal_effect.wav");
+        sound.play();
     }
     move() {
         this.x += this.dx;
         this.y += this.dy;
-        if (this.y + this.dy < 0) { // if ball hits the top
+        if (this.y + this.dy < 0) { // if ball hits the bottom
             this.dy = -this.dy;
+            console.log("hit top");
         }
-        if (this.y + this.dy > this.canvas.height) { // if ball hits the bottom
+        if (this.y + this.dy > this.canvas.height) { // if ball hits the top
             this.dy = -this.dy;
+            console.log("hit bottom");
         }
         if (this.y + this.dy > this.canvas.height || this.y + this.dy < 0) { // if ball hits the top or bottom
             this.dy = -this.dy;
+        }
+        if (this.x + this.dx < 0) { // if ball hits the left
+            // this.dx = -this.dx;
+            this.x = this.canvas.width / 2;
+            this.y = this.canvas.height / 2;
+            this.dx = -this.dx;
+            this.Player2.score++;
+            this.goal_sound();
+        }
+        if (this.x + this.dx > this.canvas.width) // if ball hits the right
+         {
+            // this.dx = -this.dx;
+            this.x = this.canvas.width / 2;
+            this.y = this.canvas.height / 2;
+            this.dx = -this.dx;
+            this.Player1.score++;
+            this.goal_sound();
+        }
+    }
+    collision(Player1, Player2) {
+        if (this.x + this.dx < this.Player1.x + this.Player1.width && this.x + this.dx > this.Player1.x && this.y + this.dy > this.Player1.y && this.y + this.dy < this.Player1.y + this.Player1.height) {
+            this.dx = -this.dx;
+            // augmente la vitesse de la balle
+            this.speed += 0.5;
+        }
+        if (this.x + this.dx < this.Player2.x + this.Player2.width && this.x + this.dx > this.Player2.x && this.y + this.dy > this.Player2.y && this.y + this.dy < this.Player2.y + this.Player2.height) {
+            this.dx = -this.dx;
+            this.speed += 0.5;
+        }
+        Player2.paddle_sound();
+    }
+    calculate_coordinates_of_ball_on_paddle(Player) {
+        var paddle_center = Player.y + Player.height / 2;
+        var ball_center = this.y + this.radius;
+        var distance = paddle_center - ball_center;
+        var y_coordinate_of_ball_on_paddle = distance / Player.height * this.canvas.height;
+        return y_coordinate_of_ball_on_paddle;
+    }
+    bot(p) {
+        var y_coordinate_of_ball_on_paddle = this.calculate_coordinates_of_ball_on_paddle(p);
+        if (y_coordinate_of_ball_on_paddle < this.y + this.radius) {
+            p.moveUp(8);
+        }
+        else if (y_coordinate_of_ball_on_paddle > this.y + this.radius) {
+            p.moveDown(8);
         }
     }
     draw() {
@@ -119,13 +199,17 @@ class Player {
     constructor(x, y, width, height, color, ctx, Canvas, score) {
         this.x = x;
         this.y = y;
-        this.color = color;
+        this.color = "rgb(" + Math.floor(Math.random() * 255 + 80) + "," + Math.floor(Math.random() * 255 + 80) + "," + 50 + Math.floor(Math.random() * 255 + 80) + ")";
         this.width = width;
         this.height = height;
         this.Canvas = Canvas;
         this.ctx = ctx;
         this.score = score;
+        this.sound = document.getElementById("paddle_effect");
         this.draw();
+    }
+    paddle_sound() {
+        // this.sound.play();
     }
     get Height() {
         return this.height;
@@ -165,4 +249,3 @@ class Player {
     }
 }
 var game = new Game();
-console.log("Hello World");
