@@ -75,17 +75,18 @@ class Game {
         this.update();
     }
     random_bar() {
-        // this.ball.bot(this.Bar);
+        this.ball.bot(this.Bar);
     }
     update() {
         this.clear();
         this.show_score(); // show score
         this.draw();
         if (!this.Pause) {
+            this.random_bar();
             this.ControleGame();
             this.ball.move();
             this.ball.collision(this.Player1, this.Player2);
-            this.ball.bot(this.Player1);
+            // this.ball.bot(this.Player1);
         }
         else
             this.paused();
@@ -111,7 +112,6 @@ class Game {
     draw() {
         if (!this.Pause) {
             this.center_line();
-            this.random_bar();
         }
         this.Player1.draw();
         this.Player2.draw();
@@ -154,7 +154,7 @@ class Ball {
         if (this.y + this.dy > this.canvas.height || this.y + this.dy < 0) { // if ball hits the top or bottom
             this.dy = -this.dy;
         }
-        if (this.x + this.dx < 0) { // if ball hits the left
+        if (this.x + this.dx < 0) {
             // this.dx = -this.dx;
             this.x = this.canvas.width / 2;
             this.y = this.canvas.height / 2;
@@ -191,14 +191,21 @@ class Ball {
         var y_coordinate_of_ball_on_paddle = distance / Player.height * this.canvas.height;
         return y_coordinate_of_ball_on_paddle;
     }
+    bar_collision(Bar) {
+        if (this.x + this.dx < Bar.x + Bar.width && this.x + this.dx > Bar.x && this.y + this.dy > Bar.y && this.y + this.dy < Bar.y + Bar.height) {
+            this.dx = -this.dx;
+            this.dx += 0.5;
+        }
+    }
     bot(p) {
         var y_coordinate_of_ball_on_paddle = this.calculate_coordinates_of_ball_on_paddle(p);
         if (y_coordinate_of_ball_on_paddle < this.y + this.radius) {
-            p.moveUp(8);
+            p.moveUp(6);
         }
         else if (y_coordinate_of_ball_on_paddle > this.y + this.radius) {
-            p.moveDown(8);
+            p.moveDown(6);
         }
+        this.bar_collision(p);
     }
     draw() {
         this.ctx.beginPath();

@@ -12,7 +12,7 @@ class Game {
     Left_UpPressed: boolean;
     Left_DownPressed: boolean;
     Pause: boolean;
-    Bar : Player;
+    Bar: Player;
 
 
     constructor() {
@@ -36,9 +36,8 @@ class Game {
         document.addEventListener("keyup", this.keyUpHandler.bind(this), false);
         this.start();
     }
-                
-    show_score()
-    {
+
+    show_score() {
         this.ctx.font = "16px Arial";
         this.ctx.fillStyle = "white";
         this.ctx.fillText(this.Player1.Score.toString(), this.canvas.width / 2 - 50, 20);
@@ -97,14 +96,12 @@ class Game {
         }
     }
 
-    start() 
-    {
+    start() {
         this.update();
     }
 
-    random_bar()
-    {
-        // this.ball.bot(this.Bar);
+    random_bar() {
+        this.ball.bot(this.Bar);
     }
 
 
@@ -114,10 +111,12 @@ class Game {
         this.show_score();  // show score
         this.draw();
         if (!this.Pause) {
+            this.random_bar();
             this.ControleGame();
             this.ball.move();
             this.ball.collision(this.Player1, this.Player2);
-            this.ball.bot(this.Player1);
+
+            // this.ball.bot(this.Player1);
         }
         else
             this.paused();
@@ -126,8 +125,6 @@ class Game {
         //     this.bar_y = this.canvas.height - 80;
         // if (this.bar_y < 0)
         //     this.bar_y = 0;
-        
-
         requestAnimationFrame(() => this.update());
 
     }
@@ -148,17 +145,15 @@ class Game {
     }
 
     draw() {
-        if (!this.Pause)
-        {
+        if (!this.Pause) {
             this.center_line();
-            this.random_bar(); 
         }
-        
+
         this.Player1.draw();
         this.Player2.draw();
         this.Bar.draw();
         this.ball.draw();
-    } 
+    }
 
 }
 
@@ -213,7 +208,7 @@ class Ball {
             this.dy = -this.dy;
         }
 
-        if (this.x + this.dx < 0) { // if ball hits the left
+        if (this.x + this.dx < 0) {
             // this.dx = -this.dx;
             this.x = this.canvas.width / 2;
             this.y = this.canvas.height / 2;
@@ -255,14 +250,22 @@ class Ball {
         return y_coordinate_of_ball_on_paddle;
     }
 
+    bar_collision(Bar: Player) {
+        if (this.x + this.dx < Bar.x + Bar.width && this.x + this.dx > Bar.x && this.y + this.dy > Bar.y && this.y + this.dy < Bar.y + Bar.height) {
+            this.dx = -this.dx;
+            this.dx += 0.5;
+        }
+    }
+
     bot(p: Player) {
         var y_coordinate_of_ball_on_paddle = this.calculate_coordinates_of_ball_on_paddle(p);
         if (y_coordinate_of_ball_on_paddle < this.y + this.radius) {
-            p.moveUp(8);
+            p.moveUp(6);
         }
         else if (y_coordinate_of_ball_on_paddle > this.y + this.radius) {
-            p.moveDown(8);
+            p.moveDown(6);
         }
+        this.bar_collision(p);
     }
 
     draw() {
