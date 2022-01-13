@@ -11,6 +11,8 @@ class Game {
         this.Left_UpPressed = false;
         this.Left_DownPressed = false;
         this.Pause = false;
+        /// set Bar in the middle of the screen
+        this.Bar = new Player(this.width / 2 - 5, this.height / 2 - 80, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
         this.Player1 = new Player(10, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
         this.Player2 = new Player(this.canvas.width - 20, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
         this.ball = new Ball(this.canvas.width / 2, this.canvas.height / 2, 6, "white", this.ctx, this.canvas, this.Player1, this.Player2);
@@ -72,19 +74,26 @@ class Game {
     start() {
         this.update();
     }
+    random_bar() {
+        // this.ball.bot(this.Bar);
+    }
     update() {
         this.clear();
-        this.draw();
         this.show_score(); // show score
+        this.draw();
         if (!this.Pause) {
             this.ControleGame();
             this.ball.move();
             this.ball.collision(this.Player1, this.Player2);
             this.ball.bot(this.Player1);
-            // this.ball.bot(this.Player2);
         }
         else
             this.paused();
+        // this.bar_y += (Math.floor(Math.random() * 40)) - 40;
+        // if (this.bar_y > this.canvas.height - 80)
+        //     this.bar_y = this.canvas.height - 80;
+        // if (this.bar_y < 0)
+        //     this.bar_y = 0;
         requestAnimationFrame(() => this.update());
     }
     clear() {
@@ -100,9 +109,13 @@ class Game {
         this.ctx.fillText("PAUSE", this.canvas.width / 2 - 50, this.canvas.height / 2);
     }
     draw() {
-        this.center_line();
+        if (!this.Pause) {
+            this.center_line();
+            this.random_bar();
+        }
         this.Player1.draw();
         this.Player2.draw();
+        this.Bar.draw();
         this.ball.draw();
     }
 }
@@ -233,10 +246,10 @@ class Player {
     draw() {
         this.ctx.beginPath();
         this.ctx.fillStyle = this.color;
-        // this.ctx.fillRect(this.x, this.y, this.width, this.height);
+        this.ctx.fillRect(this.x, this.y, this.width, this.height);
         var img = new Image();
         img.src = this.avatar;
-        this.ctx.drawImage(img, this.x, this.y, this.width, this.height);
+        // this.ctx.drawImage(img, this.x, this.y, this.width, this.height);
         this.ctx.closePath();
     }
     moveUp(direction) {

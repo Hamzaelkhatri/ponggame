@@ -12,6 +12,7 @@ class Game {
     Left_UpPressed: boolean;
     Left_DownPressed: boolean;
     Pause: boolean;
+    Bar : Player;
 
 
     constructor() {
@@ -26,15 +27,18 @@ class Game {
         this.Left_UpPressed = false;
         this.Left_DownPressed = false;
         this.Pause = false;
-        this.Player1 = new Player(10, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0,"paddle.png");
-        this.Player2 = new Player(this.canvas.width - 20, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0,"paddle.png");
+        /// set Bar in the middle of the screen
+        this.Bar = new Player(this.width / 2 - 5, this.height / 2 - 80, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
+        this.Player1 = new Player(10, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
+        this.Player2 = new Player(this.canvas.width - 20, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
         this.ball = new Ball(this.canvas.width / 2, this.canvas.height / 2, 6, "white", this.ctx, this.canvas, this.Player1, this.Player2);
         document.addEventListener("keydown", this.keyDownHandler.bind(this), false);
         document.addEventListener("keyup", this.keyUpHandler.bind(this), false);
         this.start();
     }
-
-    show_score() {
+                
+    show_score()
+    {
         this.ctx.font = "16px Arial";
         this.ctx.fillStyle = "white";
         this.ctx.fillText(this.Player1.Score.toString(), this.canvas.width / 2 - 50, 20);
@@ -93,24 +97,37 @@ class Game {
         }
     }
 
-    start() {
+    start() 
+    {
         this.update();
     }
+
+    random_bar()
+    {
+        // this.ball.bot(this.Bar);
+    }
+
 
 
     update() {
         this.clear();
-        this.draw();
         this.show_score();  // show score
+        this.draw();
         if (!this.Pause) {
             this.ControleGame();
             this.ball.move();
             this.ball.collision(this.Player1, this.Player2);
             this.ball.bot(this.Player1);
-            // this.ball.bot(this.Player2);
         }
         else
             this.paused();
+        // this.bar_y += (Math.floor(Math.random() * 40)) - 40;
+        // if (this.bar_y > this.canvas.height - 80)
+        //     this.bar_y = this.canvas.height - 80;
+        // if (this.bar_y < 0)
+        //     this.bar_y = 0;
+        
+
         requestAnimationFrame(() => this.update());
 
     }
@@ -131,11 +148,17 @@ class Game {
     }
 
     draw() {
-        this.center_line();
+        if (!this.Pause)
+        {
+            this.center_line();
+            this.random_bar(); 
+        }
+        
         this.Player1.draw();
         this.Player2.draw();
+        this.Bar.draw();
         this.ball.draw();
-    }
+    } 
 
 }
 
@@ -168,6 +191,7 @@ class Ball {
         this.Player2 = Player2;
         this.draw();
     }
+
 
     goal_sound() {
         var sound = new Audio("goal_effect.wav");
@@ -223,8 +247,7 @@ class Ball {
     }
 
 
-    calculate_coordinates_of_ball_on_paddle(Player: Player) 
-    {
+    calculate_coordinates_of_ball_on_paddle(Player: Player) {
         var paddle_center = Player.y + Player.height / 2;
         var ball_center = this.y + this.radius;
         var distance = paddle_center - ball_center;
@@ -232,8 +255,7 @@ class Ball {
         return y_coordinate_of_ball_on_paddle;
     }
 
-    bot(p: Player) 
-    {
+    bot(p: Player) {
         var y_coordinate_of_ball_on_paddle = this.calculate_coordinates_of_ball_on_paddle(p);
         if (y_coordinate_of_ball_on_paddle < this.y + this.radius) {
             p.moveUp(8);
@@ -267,7 +289,7 @@ class Player {
     sound: any;
 
 
-    constructor(x: number, y: number, width: number, height: number, color: string, ctx: CanvasRenderingContext2D, Canvas: HTMLCanvasElement, score: number,avatar:string) {
+    constructor(x: number, y: number, width: number, height: number, color: string, ctx: CanvasRenderingContext2D, Canvas: HTMLCanvasElement, score: number, avatar: string) {
         this.x = x;
         this.y = y;
         this.color = "rgb(" + Math.floor(Math.random() * 255 + 80) + "," + Math.floor(Math.random() * 255 + 80) + "," + 50 + Math.floor(Math.random() * 255 + 80) + ")";
@@ -313,10 +335,10 @@ class Player {
     draw() {
         this.ctx.beginPath();
         this.ctx.fillStyle = this.color;
-        // this.ctx.fillRect(this.x, this.y, this.width, this.height);
+        this.ctx.fillRect(this.x, this.y, this.width, this.height);
         var img = new Image();
         img.src = this.avatar;
-        this.ctx.drawImage(img, this.x, this.y, this.width, this.height);
+        // this.ctx.drawImage(img, this.x, this.y, this.width, this.height);
         this.ctx.closePath();
     }
 
