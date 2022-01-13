@@ -26,8 +26,8 @@ class Game {
         this.Left_UpPressed = false;
         this.Left_DownPressed = false;
         this.Pause = false;
-        this.Player1 = new Player(10, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0);
-        this.Player2 = new Player(this.canvas.width - 20, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0);
+        this.Player1 = new Player(10, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0,"paddle.png");
+        this.Player2 = new Player(this.canvas.width - 20, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0,"paddle.png");
         this.ball = new Ball(this.canvas.width / 2, this.canvas.height / 2, 6, "white", this.ctx, this.canvas, this.Player1, this.Player2);
         document.addEventListener("keydown", this.keyDownHandler.bind(this), false);
         document.addEventListener("keyup", this.keyUpHandler.bind(this), false);
@@ -263,10 +263,11 @@ class Player {
     ctx: CanvasRenderingContext2D;
     Canvas: HTMLCanvasElement;
     score: number;
+    avatar: string;
     sound: any;
 
 
-    constructor(x: number, y: number, width: number, height: number, color: string, ctx: CanvasRenderingContext2D, Canvas: HTMLCanvasElement, score: number) {
+    constructor(x: number, y: number, width: number, height: number, color: string, ctx: CanvasRenderingContext2D, Canvas: HTMLCanvasElement, score: number,avatar:string) {
         this.x = x;
         this.y = y;
         this.color = "rgb(" + Math.floor(Math.random() * 255 + 80) + "," + Math.floor(Math.random() * 255 + 80) + "," + 50 + Math.floor(Math.random() * 255 + 80) + ")";
@@ -276,6 +277,7 @@ class Player {
         this.ctx = ctx;
         this.score = score;
         this.sound = document.getElementById("paddle_effect");
+        this.avatar = avatar;
         this.draw();
     }
 
@@ -311,7 +313,10 @@ class Player {
     draw() {
         this.ctx.beginPath();
         this.ctx.fillStyle = this.color;
-        this.ctx.fillRect(this.x, this.y, this.width, this.height);
+        // this.ctx.fillRect(this.x, this.y, this.width, this.height);
+        var img = new Image();
+        img.src = this.avatar;
+        this.ctx.drawImage(img, this.x, this.y, this.width, this.height);
         this.ctx.closePath();
     }
 
