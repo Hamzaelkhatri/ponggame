@@ -11,10 +11,11 @@ RUN apt-get install -y build-essential
 RUN apt-get install -y wget git unzip zip curl 
 RUN npm install -g typescript
 
-#install nestjs
-RUN n 6.0.0
-RUN npm install -g nestjs
 
+#install nestjs
+RUN n stable
+RUN npm install -g nestjs
+RUN npm i -g @nestjs/cli
 RUN git clone https://github.com/Hamzaelkhatri/ponggame.git /ponggame
 
 RUN cd /ponggame

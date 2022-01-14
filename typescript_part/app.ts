@@ -115,16 +115,9 @@ class Game {
             this.ControleGame();
             this.ball.move();
             this.ball.collision(this.Player1, this.Player2);
-
-            // this.ball.bot(this.Player1);
         }
         else
             this.paused();
-        // this.bar_y += (Math.floor(Math.random() * 40)) - 40;
-        // if (this.bar_y > this.canvas.height - 80)
-        //     this.bar_y = this.canvas.height - 80;
-        // if (this.bar_y < 0)
-        //     this.bar_y = 0;
         requestAnimationFrame(() => this.update());
 
     }
