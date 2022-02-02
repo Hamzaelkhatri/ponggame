@@ -282,8 +282,8 @@ function draw() {
     animate();
     manage_ball();// manage ball movement
     if (pause == false) {
-        botRight();
-        bot_left();
+        // botRight();
+        // bot_left();
         key_hook();
         fixed_line();
         x += dx;
