@@ -34,7 +34,7 @@ class Game {
         this.Bar = new Player(this.width / 2 - 5, this.height / 2 - 80, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
         this.Player1 = new Player(10, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
         this.Player2 = new Player(this.canvas.width - 20, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
-        this.ball = new Ball(this.canvas.width / 2, this.canvas.height / 2, 6, "white", this.ctx, this.canvas, this.Player1, this.Player2);
+        this.ball = new Ball(this.canvas.width / 2, this.canvas.height / 2, 8, "white", this.ctx, this.canvas, this.Player1, this.Player2);
         document.addEventListener("keydown", this.keyDownHandler.bind(this), false);
         document.addEventListener("keyup", this.keyUpHandler.bind(this), false);
         this.start();
@@ -49,35 +49,35 @@ class Game {
 
 
     keyDownHandler(e: KeyboardEvent) {
-        if (e.key == "Up" || e.key == "ArrowUp") {
+        if (e.key === "Up" || e.key === "ArrowUp") {
             this.Right_UpPressed = true;
         }
-        else if (e.key == "Down" || e.key == "ArrowDown") {
+        else if (e.key === "Down" || e.key === "ArrowDown") {
             this.Right_DownPressed = true;
         }
 
-        if (e.key == "w" || e.key == "KeyW") {
+        if (e.key === "w" || e.key === "KeyW") {
             this.Left_UpPressed = true;
         }
-        else if (e.key == "s" || e.key == "KeyS") {
+        else if (e.key === "s" || e.key === "KeyS") {
             this.Left_DownPressed = true;
         }
-        if (e.key == "p" || e.key == "KeyP" || e.key == "P" || e.key == " " || e.key == "Space") {
+        if (e.key === "p" || e.key === "KeyP" || e.key === "P" || e.key === " " || e.key === "Space") {
             this.Pause = !this.Pause;
         }
     }
 
     keyUpHandler(e: KeyboardEvent) {
-        if (e.key == "Up" || e.key == "ArrowUp") {
+        if (e.key === "Up" || e.key === "ArrowUp") {
             this.Right_UpPressed = false;
         }
-        else if (e.key == "Down" || e.key == "ArrowDown") {
+        else if (e.key === "Down" || e.key === "ArrowDown") {
             this.Right_DownPressed = false;
         }
-        if (e.key == "w" || e.key == "KeyW") {
+        if (e.key === "w" || e.key === "KeyW") {
             this.Left_UpPressed = false;
         }
-        else if (e.key == "s" || e.key == "KeyS") {
+        else if (e.key === "s" || e.key === "KeyS") {
             this.Left_DownPressed = false;
         }
 
@@ -172,7 +172,7 @@ class Ball {
         this.y = y;
         this.radius = radius;
         this.color = "rgb(" + Math.floor(Math.random() * 255 + 80) + "," + Math.floor(Math.random() * 255 + 80) + "," + 50 + Math.floor(Math.random() * 255 + 80) + ")";
-        this.speed = 3
+        this.speed = 1;
         this.ctx = ctx;;
         this.ballradius = radius;
         this.canvas = Canvas;
@@ -367,223 +367,6 @@ const Canvas = (props : any) => {
         game.start();
     }, []);
     return <canvas ref={canvasRef}  {...props} width={800} height={400} />
-
-    // return (
-    //     <div>
-    //         <canvas ref={canvasRef} width={props.width} height={props.height} />
-    //     </div>
-    // )
-    // let frameCount = 10
-    // let animationFrameId = 0
-    // let Right_downPressed = false
-    // let Right_upPressed = false
-    // let Left_downPressed = false
-    // let Left_upPressed = false
-    // let Pause = false
-
-    // const padlle = (ctx:any, x:any, y:any, h:any, w:any) => {
-    //     ctx.fillStyle = '#FFFFFF'
-    //     ctx.beginPath()
-    //     ctx.rect(x, y, h, w)
-    //     ctx.fill()
-    //     ctx.closePath()
-    // }
-
-    // const ball = (ctx:any, x:any, y:any, r:any) => {
-    //     ctx.fillStyle = '#FFFFFF'
-    //     ctx.beginPath()
-    //     ctx.arc(x, y, r, 0, Math.PI * 2, true)
-    //     ctx.fill()
-    //     ctx.closePath()
-    // }
-
-    // useEffect(() => {
-    //     const canvas = canvasRef.current as any
-    //     const context = canvas.getContext('2d') as CanvasRenderingContext2D
-    //     const rightPaddle = {
-    //         x: canvas.width - 20,
-    //         y: (canvas.height - 80) / 2,
-    //         w: 80,
-    //         h: 10
-    //     }
-
-    //     const leftPaddle = {
-    //         x: 10,
-    //         y: (canvas.height - 80) / 2,
-    //         w: 80,
-    //         h: 10
-    //     }
-        
-    //     //Our first draw
-    //     const draw = (ctx:any) => 
-    //     {
-    //         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-    //         context.fillStyle = '#000000'
-    //         context.fillRect(0, 0, context.canvas.width, context.canvas.height)
-    //         padlle(ctx, rightPaddle.x, rightPaddle.y, rightPaddle.h, rightPaddle.w)
-    //         padlle(ctx, leftPaddle.x, leftPaddle.y, leftPaddle.h, leftPaddle.w)
-
-       
-    //         // ball(ctx, context.canvas.width / 2, context.canvas.height / 2, 6)
-    //     }
-        
-    //     let width = context.canvas.width
-    //     let height = context.canvas.height
-    //     let x = context.canvas.width / 2
-    //     let y = context.canvas.height / 2
-    //     let dx = 2
-    //     let dy = -2
-    //     let RightpaddleHeight = 80
-    //     let LeftpaddleHeight =80
-    //     let RightpaddleY = (height -  RightpaddleHeight) / 2
-    //     let LeftpaddleY =  (height -  LeftpaddleHeight) / 2
-    //     let speed = 1
-    //     let right_score = 0
-    //     let left_score = 0        
-
-    //     const controleBall = (ctx:any) => 
-    //     {
-           
-    //         if (y + dy < 0) {// if ball hits the top
-    //             dy = -dy;
-    //         }
-    //         if (y + dy > canvas.height) {// if ball hits the bottom
-    //             dy = -dy;
-    //         }
-    //         if (y + dy > canvas.height || y + dy < 0) { // if ball hits the top or bottom
-    //             dy = -dy;
-    //         }
-    //         // check if ball hits the paddle
-    //         if (x + dx > canvas.width - 20) {
-    //             if (y > RightpaddleY && y < RightpaddleY + RightpaddleHeight) {
-    //                 // dy = -dy;
-    //                 dx = -dx;
-    //                 // dx *= 1.1;
-    //                 // if (dx >18) {
-    //                 //     dx = 2;
-    //                 // }
-    //                 // alert("Right Paddle");
-    //             }
-    //             else if (x + dx > canvas.width) {
-    //                 speed = 0;
-    //                 right_score++;
-    //                 x = width / 2;
-    //                 y = height / 2;
-    //                 dx = -dx;
-    //             }
-    //         }
-    //         if (x + dx < 20) {
-    //             if (y > LeftpaddleY && y < LeftpaddleY + LeftpaddleHeight || x + dx < 0) {
-    //                 // dy = -dy;
-    //                 dx = -dx;
-    //                 // dx *= 1.1;
-    //                 // if (dx > 18) {
-    //                 //     dx = 2;
-                        
-    //                 // }
-    //                 // alert("Left Paddle");
-    //             }
-    //             else if (x + dx < 10) {
-    //                 left_score += 1;
-    //                 dx = -dx;
-    //                 x = width / 2;
-    //                 y = height / 2;
-    //             }
-    //         }
-           
-    //     }
-
-    //     const GameControll = () => 
-    //     {
-    //         if (Left_upPressed === true) 
-    //         {
-    //             leftPaddle.y -= 5
-    //             if(leftPaddle.y < 0)
-    //             {
-    //                 leftPaddle.y = 0
-    //             }
-    //         }
-    //         else if (Left_downPressed === true)
-    //         {
-    //             leftPaddle.y += 5
-    //             if(leftPaddle.y > canvas.height - leftPaddle.h - 70) 
-    //             {
-    //                 leftPaddle.y = canvas.height - leftPaddle.h - 70
-    //             }
-    //         }
-    //         if ( Right_upPressed=== true)
-    //         {
-    //             rightPaddle.y -= 5
-    //             if(rightPaddle.y < 0)
-    //             {
-    //                 rightPaddle.y = 0
-    //             }
-    //         }
-    //         else if (Right_downPressed === true)
-    //         {
-    //             rightPaddle.y += 5
-    //             if(rightPaddle.y > canvas.height - rightPaddle.h - 70)
-    //             {
-    //                 rightPaddle.y = canvas.height - rightPaddle.h - 70
-    //             }
-    //         }
-    //     }
-
-    //     const render = () => {
-    //         draw(context)
-    //         controleBall(context)
-    //         ball(context, x, y, 6)
-    //         GameControll()
-    //         x += dx;
-    //         y += dy;
-    //         animationFrameId = window.requestAnimationFrame(render)
-    //     }
-    //     render()
-
-    //     const keydownHandler = (e:any) => {
-    //         if (e.key === "Up" || e.key === "ArrowUp") {
-    //             Right_upPressed = true
-    //         }
-    //         else if (e.key === "Down" || e.key === "ArrowDown") {
-    //             Right_downPressed = true
-    //         }
-    
-    //         if (e.key === "w" || e.key === "KeyW") {
-    //             Left_upPressed = true
-    //         }
-    //         else if (e.key === "s" || e.key === "KeyS") {
-    //             Left_downPressed = true
-    //         }
-    //         if (e.key === "p" || e.key === "KeyP" || e.key === "P" || e.key === " " || e.key === "Space") {
-    //             Pause = !Pause
-    //         }
-    //     }
-
-    //     const keyupHandler = (e:any) => {
-    //         if (e.key === "Up" || e.key === "ArrowUp") {
-    //             Right_upPressed = false
-    //         }
-    //         else if (e.key === "Down" || e.key === "ArrowDown") {
-    //             Right_downPressed = false
-    //         }
-    //         if (e.key === "w" || e.key === "KeyW") {
-    //             Left_upPressed = false
-    //         }
-    //         else if (e.key === "s" || e.key === "KeyS") {
-    //             Left_downPressed = false
-    //         }
-    //     }
-
-       
-
-    //     window.addEventListener('keydown', keydownHandler)
-    //     window.addEventListener('keyup', keyupHandler)
-
-    //     return () => {
-    //         window.cancelAnimationFrame(animationFrameId)
-    //     }
-    // }, [])
-
 }
 }
 export default Canvas
