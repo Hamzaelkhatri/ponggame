@@ -1,0 +1,56 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>NestJS</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.18/vue.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+    </head>
+
+    <body>
+        <h1>NestJS</h1>
+        <div id="v-app">  
+        <form>
+            <input v-model="name" type="text" placeholder="Name">
+            <button type="submit" @click.prevent="Send()" >Submits</button>
+        </form>
+
+        <p>
+            <ul>
+                <li v-for="item in items">
+                    {{ item }}
+                </li>
+            </ul>
+        </p>
+    </div>
+    <script>
+        const app = new Vue({
+            el: '#v-app',
+            data: {
+                name: 'Hello',
+                items: ['helo', 'world'],
+                socket : null
+            },
+            methods: {
+                Send() {
+                    console.log(`send :${this.name}`);
+                    this.socket.emit('DataToServer',this.name);
+                    this.name = '';
+                },
+                ReceiveMessage(message) {
+                    console.log(`receive ${message}`);
+                    this.items.push(message);
+                    this.name = '';
+                }
+            },
+            created()
+            {
+                this.socket = io('http://localhost:3003');
+                this.socket.on('DataToClient', (data) => {
+                    this.ReceiveMessage(data);
+                });
+            }
+        });
+    </script> 
+</body>
+
+</html>
