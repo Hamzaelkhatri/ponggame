@@ -44,10 +44,7 @@
             },
             created()
             {
-                this.socket = io('http://localhost:3003');
-                this.socket.on('DataToClient', (data) => {
-                    this.ReceiveMessage(data);
-                });
+            
             }
         });
     </script> 

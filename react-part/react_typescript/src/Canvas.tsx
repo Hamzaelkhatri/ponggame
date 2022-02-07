@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react'
+import { io, Socket } from 'socket.io-client';
 
 
 class Game {
@@ -16,21 +17,40 @@ class Game {
     Left_DownPressed: boolean;
     Pause: boolean;
     Bar: Player;
-
+    socket: Socket;
+    Client: string = "0";
+    Sender: string = "0";
 
     constructor(canvas: HTMLCanvasElement) {
+
         this.canvas = canvas;
         this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
         this.width = this.canvas.width;
         this.height = this.canvas.height;
         this.color = "rgb(44, 44, 84)";
+        this.Sender = "1";
+        this.Client = "1";
         this.canvas.style.backgroundColor = this.color;
+        this.socket = io('http://localhost:3600');
+        this.Client = this.socket.io.engine.id;
+        this.socket.on('DataToClient', (data) => {
+            this.Sender = data.Client;
+            console.log(data.Player1);
+            this.ball.x = data.Ball.x;
+            this.ball.y = data.Ball.y;
+            this.ball.dx = data.Ball.dx;
+            this.ball.dy = data.Ball.dy;
+
+            if(data.t === true)
+            this.Player1.x = data.Player1.x;
+            this.Player1.y = data.Player1.y;
+            // }
+        });
         this.Right_UpPressed = false;
         this.Right_DownPressed = false;
         this.Left_UpPressed = false;
         this.Left_DownPressed = false;
         this.Pause = false;
-        /// set Bar in the middle of the screen
         this.Bar = new Player(this.width / 2 - 5, this.height / 2 - 80, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
         this.Player1 = new Player(10, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
         this.Player2 = new Player(this.canvas.width - 20, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
@@ -39,6 +59,18 @@ class Game {
         document.addEventListener("keyup", this.keyUpHandler.bind(this), false);
         this.start();
     }
+
+    ToJson(t:boolean) {
+        return {
+            "Player1": this.Player1.ToJson(),
+            "Player2": this.Player2.ToJson(),
+            "Ball": this.ball.ToJson(),
+            "Bar": this.Bar.ToJson(),
+            "Client": this.socket.io.engine.id,
+            "keyhook" : t
+        }
+    }
+
 
     show_score() {
         this.ctx.font = "16px Arial";
@@ -86,21 +118,26 @@ class Game {
     ControleGame() {
         if (this.Left_DownPressed) {
             this.Player1.moveUp(4);
+            this.socket.emit('DataToServer', this.ToJson());
         }
         else if (this.Left_UpPressed) {
             this.Player1.moveDown(4);
+            this.socket.emit('DataToServer', this.ToJson());
         }
 
         if (this.Right_DownPressed) {
             this.Player2.moveUp(4);
+            this.socket.emit('DataToServer', this.ToJson());
         }
         else if (this.Right_UpPressed) {
             this.Player2.moveDown(4);
+            this.socket.emit('DataToServer', this.ToJson());
         }
     }
 
     start() {
         this.update();
+
     }
 
     random_bar() {
@@ -118,6 +155,7 @@ class Game {
             this.ControleGame();
             this.ball.move();
             this.ball.collision(this.Player1, this.Player2);
+
         }
         else
             this.paused();
@@ -147,7 +185,6 @@ class Game {
 
         this.Player1.draw();
         this.Player2.draw();
-        // this.Bar.draw();
         this.ball.draw();
     }
 
@@ -185,8 +222,6 @@ class Ball {
 
 
     goal_sound() {
-        var sound = new Audio("goal_effect.wav");
-        sound.play();
     }
 
     move() {
@@ -205,7 +240,6 @@ class Ball {
         }
 
         if (this.x + this.dx < 0) {
-            // this.dx = -this.dx;
             this.x = this.canvas.width / 2;
             this.y = this.canvas.height / 2;
             this.dx = -this.dx;
@@ -227,7 +261,6 @@ class Ball {
     collision(Player1: Player, Player2: Player) {
         if (this.x + this.dx < this.Player1.x + this.Player1.width && this.x + this.dx > this.Player1.x && this.y + this.dy > this.Player1.y && this.y + this.dy < this.Player1.y + this.Player1.height) {
             this.dx = -this.dx;
-            // augmente la vitesse de la balle
             this.speed += 0.5;
         }
         if (this.x + this.dx < this.Player2.x + this.Player2.width && this.x + this.dx > this.Player2.x && this.y + this.dy > this.Player2.y && this.y + this.dy < this.Player2.y + this.Player2.height) {
@@ -272,7 +305,18 @@ class Ball {
         this.ctx.closePath();
     }
 
-
+    ToJson() {
+        return {
+            "x": this.x,
+            "y": this.y,
+            "dx": this.dx,
+            "dy": this.dy,
+            "speed": this.speed,
+            "radius": this.radius,
+            "color": this.color,
+            "ballradius": this.ballradius,
+        }
+    }
 }
 
 class Player {
@@ -297,14 +341,12 @@ class Player {
         this.Canvas = Canvas;
         this.ctx = ctx;
         this.score = score;
-        this.sound = document.getElementById("paddle_effect");
         this.avatar = avatar;
         this.draw();
     }
 
     paddle_sound() {
 
-        // this.sound.play();
     }
 
     get Height() {
@@ -331,13 +373,25 @@ class Player {
         this.score += value;
     }
 
+    ToJson() {
+        return {
+            x: this.x,
+            y: this.y,
+            width: this.width,
+            height: this.height,
+            color: this.color,
+            score: this.score,
+            avatar: this.avatar
+        }
+    }
+
+
     draw() {
         this.ctx.beginPath();
         this.ctx.fillStyle = this.color;
         this.ctx.fillRect(this.x, this.y, this.width, this.height);
-        var img = new Image();
-        img.src = this.avatar;
-        // this.ctx.drawImage(img, this.x, this.y, this.width, this.height);
+        // var img = new Image();
+        // img.src = this.avatar;
         this.ctx.closePath();
     }
 
@@ -358,15 +412,15 @@ class Player {
 
 
 
-const Canvas = (props : any) => {
-{
+const Canvas = (props: any) => {
     const canvasRef = useRef(null)
-  
+
+
+
     useEffect(() => {
         var game = new Game(canvasRef.current as any);
         game.start();
     }, []);
     return <canvas ref={canvasRef}  {...props} width={800} height={400} />
-}
 }
 export default Canvas
