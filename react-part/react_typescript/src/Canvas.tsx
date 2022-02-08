@@ -20,7 +20,7 @@ class Game {
     socket: Socket;
     Bsocket: Socket;
     Client: string = "0";
-    Sender: string = "0";
+    Sender: string[];
 
     constructor(canvas: HTMLCanvasElement) {
 
@@ -29,12 +29,12 @@ class Game {
         this.width = this.canvas.width;
         this.height = this.canvas.height;
         this.color = "rgb(44, 44, 84)";
-        this.Sender = "1";
         this.Client = "1";
+        this.Sender = [];
         this.Pause = false;
 
         this.canvas.style.backgroundColor = this.color;
-        this.socket = io('http://10.12.9.14:3600');
+        this.socket = io('http://10.12.9.14:3600').connect();
         this.Bsocket = io('http://10.12.9.14:3600');
         this.Bsocket.on('DataToClient2', (data: any) => {
             this.ball.x = data.Ball.x;
@@ -45,11 +45,12 @@ class Game {
             this.Player1.score = data.Player1.score;
             this.Player2.score = data.Player2.score;
         });
-        this.Client = this.socket.io.engine.id;
         this.socket.on('DataToClient', (data) => {
-            this.Sender = data.Client;
-            this.Player1.x = data.Player1.x;
+            console.log("data" + data);
+            this.Sender = data.username;
+            this.Client = this.socket.io.engine.id;
             this.Player1.y = data.Player1.y;
+            this.Player1.x = data.Player1.x;
             this.Player2.x = data.Player2.x;
             this.Player2.y = data.Player2.y;
 
@@ -160,12 +161,18 @@ class Game {
         this.draw();
         if (!this.Pause) {
             this.random_bar();
-            this.ControleGame();
+            if (this.Sender.length === 0) {
+                this.socket.emit('DataToServer', this.ToJson());
+            }
+            if (this.Sender.find(x => x === this.socket.io.engine.id))
+                this.ControleGame();
+            console.log("senders" + this.Sender);
+            console.log("clients" + this.Client);
             this.ball.move();
             this.ball.collision(this.Player1, this.Player2);
         }
         else
-        this.paused();
+            this.paused();
         requestAnimationFrame(() => this.update());
 
     }
@@ -193,7 +200,6 @@ class Game {
         this.Player1.draw();
         this.Player2.draw();
         this.Bsocket.emit('DataToServer2', this.ToJson());
-
         this.ball.draw();
     }
 
@@ -222,8 +228,8 @@ class Ball {
         this.ctx = ctx;;
         this.ballradius = radius;
         this.canvas = Canvas;
-        this.dx = -this.speed;
-        this.dy = this.speed;
+        this.dx = -3;
+        this.dy = 3;
         this.Player1 = Player1;
         this.Player2 = Player2;
         this.draw();
@@ -238,11 +244,9 @@ class Ball {
         this.y += this.dy;
         if (this.y + this.dy < 0) {// if ball hits the bottom
             this.dy = -this.dy;
-            console.log("hit top");
         }
         if (this.y + this.dy > this.canvas.height) {// if ball hits the top
             this.dy = -this.dy;
-            console.log("hit bottom");
         }
         if (this.y + this.dy > this.canvas.height || this.y + this.dy < 0) { // if ball hits the top or bottom
             this.dy = -this.dy;
@@ -262,7 +266,6 @@ class Ball {
             this.y = this.canvas.height / 2;
             this.dx = -this.dx;
             this.Player1.score++;
-            this.goal_sound();
         }
 
     }
@@ -270,13 +273,12 @@ class Ball {
     collision(Player1: Player, Player2: Player) {
         if (this.x + this.dx < this.Player1.x + this.Player1.width && this.x + this.dx > this.Player1.x && this.y + this.dy > this.Player1.y && this.y + this.dy < this.Player1.y + this.Player1.height) {
             this.dx = -this.dx;
-            this.speed += 0.5;
+            this.speed += 1;
         }
         if (this.x + this.dx < this.Player2.x + this.Player2.width && this.x + this.dx > this.Player2.x && this.y + this.dy > this.Player2.y && this.y + this.dy < this.Player2.y + this.Player2.height) {
             this.dx = -this.dx;
-            this.speed += 0.5;
+            this.speed += 1;
         }
-        Player2.paddle_sound();
     }
 
 
