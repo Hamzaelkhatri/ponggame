@@ -18,6 +18,7 @@ class Game {
     Pause: boolean;
     Bar: Player;
     socket: Socket;
+    Bsocket: Socket;
     Client: string = "0";
     Sender: string = "0";
 
@@ -30,27 +31,34 @@ class Game {
         this.color = "rgb(44, 44, 84)";
         this.Sender = "1";
         this.Client = "1";
+        this.Pause = false;
+
         this.canvas.style.backgroundColor = this.color;
-        this.socket = io('http://localhost:3600');
-        this.Client = this.socket.io.engine.id;
-        this.socket.on('DataToClient', (data) => {
-            this.Sender = data.Client;
-            console.log(data.Player1);
+        this.socket = io('http://10.12.9.14:3600');
+        this.Bsocket = io('http://10.12.9.14:3600');
+        this.Bsocket.on('DataToClient2', (data: any) => {
             this.ball.x = data.Ball.x;
             this.ball.y = data.Ball.y;
             this.ball.dx = data.Ball.dx;
             this.ball.dy = data.Ball.dy;
-
-            if(data.t === true)
+            this.Pause = data.Pause;
+            this.Player1.score = data.Player1.score;
+            this.Player2.score = data.Player2.score;
+        });
+        this.Client = this.socket.io.engine.id;
+        this.socket.on('DataToClient', (data) => {
+            this.Sender = data.Client;
             this.Player1.x = data.Player1.x;
             this.Player1.y = data.Player1.y;
-            // }
+            this.Player2.x = data.Player2.x;
+            this.Player2.y = data.Player2.y;
+
         });
+
         this.Right_UpPressed = false;
         this.Right_DownPressed = false;
         this.Left_UpPressed = false;
         this.Left_DownPressed = false;
-        this.Pause = false;
         this.Bar = new Player(this.width / 2 - 5, this.height / 2 - 80, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
         this.Player1 = new Player(10, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
         this.Player2 = new Player(this.canvas.width - 20, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
@@ -60,14 +68,14 @@ class Game {
         this.start();
     }
 
-    ToJson(t:boolean) {
+    ToJson() {
         return {
             "Player1": this.Player1.ToJson(),
             "Player2": this.Player2.ToJson(),
             "Ball": this.ball.ToJson(),
             "Bar": this.Bar.ToJson(),
             "Client": this.socket.io.engine.id,
-            "keyhook" : t
+            "Pause": this.Pause,
         }
     }
 
@@ -155,10 +163,9 @@ class Game {
             this.ControleGame();
             this.ball.move();
             this.ball.collision(this.Player1, this.Player2);
-
         }
         else
-            this.paused();
+        this.paused();
         requestAnimationFrame(() => this.update());
 
     }
@@ -185,6 +192,8 @@ class Game {
 
         this.Player1.draw();
         this.Player2.draw();
+        this.Bsocket.emit('DataToServer2', this.ToJson());
+
         this.ball.draw();
     }
 

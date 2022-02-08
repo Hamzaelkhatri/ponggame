@@ -26,8 +26,12 @@ export class AppGateway implements OnGatewayInit ,OnGatewayConnection,OnGatewayD
 
 
   @SubscribeMessage('DataToServer')
-  handleMessage(client: Socket, payload: string ): WsResponse<any> {
+  handleMessage(client: Socket, payload: string ): void {
     client.broadcast.emit('DataToClient', payload);
-    return { event: 'DataToClient', data: payload };
+  } 
+
+  @SubscribeMessage('DataToServer2')
+  handleBall(client: Socket, payload: string ): void {
+    this.server.emit('DataToClient2', payload);
   } 
 }
