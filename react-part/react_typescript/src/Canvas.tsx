@@ -34,8 +34,8 @@ class Game {
         this.Pause = false;
 
         this.canvas.style.backgroundColor = this.color;
-        this.socket = io('http://10.12.9.14:3600').connect();
-        this.Bsocket = io('http://10.12.9.14:3600');
+        this.socket = io('http://localhost:3600').connect();
+        this.Bsocket = io('http://localhost:3600');
         this.Bsocket.on('DataToClient2', (data: any) => {
             this.ball.x = data.Ball.x;
             this.ball.y = data.Ball.y;
@@ -161,10 +161,10 @@ class Game {
         this.draw();
         if (!this.Pause) {
             this.random_bar();
-            if (this.Sender.length === 0) {
-                this.socket.emit('DataToServer', this.ToJson());
-            }
-            if (this.Sender.find(x => x === this.socket.io.engine.id))
+            // if (this.Sender.length === 0) {
+                // this.socket.emit('DataToServer', this.ToJson());
+            // }
+            // if (this.Sender.find(x => x === this.socket.io.engine.id))
                 this.ControleGame();
             console.log("senders" + this.Sender);
             console.log("clients" + this.Client);
