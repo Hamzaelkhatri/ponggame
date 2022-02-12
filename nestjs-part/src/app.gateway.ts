@@ -45,19 +45,23 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   @SubscribeMessage('connectServer')
   connect_users(client: Socket, payload : any): void 
   {
-    console.log(payload);
-    if(payload == "init" || (this.P1 != "0" && this.P2 != "1"))
+    // console.log(this.P1 +" || "+ this.P2);
+    if(payload === "init")
     {
+      client.broadcast.emit('connectClient', {P1: this.P1, P2: this.P2});
       return ;
     }
-    if(this.P1 == "0" && this.P1 != this.P2)
-    {
-      this.P1 = payload;
-    } 
-    else if(this.P2 == "1" && this.P1 !== this.P2)
-    {
-      this.P2 = payload;
-    }
-    client.broadcast.emit('connectClient', {P1: this.P1, P2: this.P2});
+    this.P1 = payload.p1;
+    this.P2 = payload.p2;
+    // if(this.P1 == "0" && this.P1 != this.P2)
+    // {
+    //   this.P1 = payload;
+    // } 
+    // else if(this.P2 == "1" && this.P1 !== this.P2)
+    // {
+    //   this.P2 = payload;
+    // }
+
+    
   }
 }

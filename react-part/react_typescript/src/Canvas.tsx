@@ -55,12 +55,12 @@ class Game {
 
         this.socket.on('connectClient', (data) =>
         {
-            console.log("data " , data);
+            console.log("data " , data.P1, data.P2);
             if(data.P1 !== "0" && data.P2 === "1")
             {
                 window.alert("Player 1 Connected");
             }
-            else if(data.P1 !== "0" && data.P2 !== "1")
+            if(data.P1 !== "0" && data.P2 !== "1")
             {
                 window.alert("Both Players Connected");
             }
@@ -158,7 +158,6 @@ class Game {
 
     start() 
     {
-        this.socket.emit('connectClient', window.sessionStorage.getItem("email"));
         this.update();
 
     }
@@ -173,6 +172,8 @@ class Game {
         this.clear();
         this.show_score();  // show score
         this.draw();
+        this.socket.emit('connectClient', "init");
+
         if (!this.Pause) {
             this.random_bar();
             // if (this.Sender.length === 0) {

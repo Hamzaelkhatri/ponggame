@@ -27,7 +27,7 @@ export default function App() {
   const Bsocket : Socket = io('http://localhost:3600');
   
   if (window.sessionStorage.getItem("email") !== null) {
-    Bsocket.emit("connectServer", window.sessionStorage.getItem("email"));
+    Bsocket.emit("connectServer",{ p1:window.sessionStorage.getItem("email"), p2:window.sessionStorage.getItem("inviter")});
     return (
 
       <div className="App">
@@ -42,10 +42,11 @@ export default function App() {
 
   //initial WebSocketServer 
   const socket = io('http://localhost:3600');
-  console.log(window.sessionStorage.getItem("email"));
+  // console.log(window.sessionStorage.getItem("email"));
 
   const onSubmit: SubmitHandler<FormValues> = (data: any) => {
     window.sessionStorage.setItem("email", data.email);
+    window.sessionStorage.setItem("inviter", data.lastName);
     Bsocket.emit("connectServer", data.email);
     setData({ Id: data.firstName, Name: data.lastName, Email: data.email });
     setShowForm(false);
