@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 // import { useRef, useEffect } from 'react'
@@ -19,23 +18,36 @@ type FormValues = {
 
 export default function App() {
 
-
-
   const { register, handleSubmit } = useForm<FormValues>();
   const [showCanvas, setShowCanvas] = useState(false);
   const [showForm, setShowForm] = useState(true);
   const [showTtile, setTtile] = useState(true);
   const [CanvasTitle, setCanvasTitle] = useState(false);
-  const [datas, setData] =  useState({Id:"hello", Name:"hello", Email:""});    
-  let T 
+  const [datas, setData] = useState({ Id: "hello", Name: "hello", Email: "" });
+  const Bsocket : Socket = io('http://localhost:3600');
+  
+  if (window.sessionStorage.getItem("email") !== null) {
+    Bsocket.emit("connectServer", window.sessionStorage.getItem("email"));
+    return (
+
+      <div className="App">
+        <Canvas />
+
+      </div>
+
+    );
+  }
+
+  let T
 
   //initial WebSocketServer 
   const socket = io('http://localhost:3600');
-  
-  const onSubmit: SubmitHandler<FormValues> = (data:any) => {
-    // alert(JSON.stringify(data));
-    
-    setData({Id:data.firstName, Name:data.lastName,Email:data.email});
+  console.log(window.sessionStorage.getItem("email"));
+
+  const onSubmit: SubmitHandler<FormValues> = (data: any) => {
+    window.sessionStorage.setItem("email", data.email);
+    Bsocket.emit("connectServer", data.email);
+    setData({ Id: data.firstName, Name: data.lastName, Email: data.email });
     setShowForm(false);
     setShowCanvas(true);
     setTtile(false);
@@ -44,8 +56,8 @@ export default function App() {
   }
 
   return (
-    
-    <div  className="App">
+
+    <div className="App">
       {/* <center> */}
       {showTtile
         && <h1>Ping Pong Player - Registration</h1>
@@ -72,18 +84,17 @@ export default function App() {
         </form>
       }
       {/* {CanvasTitle && <h1>Ping Pong Player - Canvas</h1>} */}
-      
+
 
 
       {/* {} */}
       {showCanvas && <Canvas data={datas.valueOf()} />}
 
-    {/* </center> */}
+      {/* </center> */}
     </div>
 
   );
 }
-
 
 // import React from "react";
 // import { useForm, SubmitHandler } from "react-hook-form";

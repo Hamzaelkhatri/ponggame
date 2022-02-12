@@ -19,8 +19,6 @@ class Game {
     Bar: Player;
     socket: Socket;
     Bsocket: Socket;
-    Client: string = "0";
-    Sender: string[];
 
     constructor(canvas: HTMLCanvasElement) {
 
@@ -28,15 +26,15 @@ class Game {
         this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
         this.width = this.canvas.width;
         this.height = this.canvas.height;
-        this.color = "rgb(44, 44, 84)";
-        this.Client = "1";
-        this.Sender = [];
+        //color: #0e101c;
+        this.color  = "#0e101c";
         this.Pause = false;
 
         this.canvas.style.backgroundColor = this.color;
         this.socket = io('http://localhost:3600').connect();
         this.Bsocket = io('http://localhost:3600');
-        this.Bsocket.on('DataToClient2', (data: any) => {
+        this.Bsocket.on('DataToClient2', (data: any) => 
+        {
             this.ball.x = data.Ball.x;
             this.ball.y = data.Ball.y;
             this.ball.dx = data.Ball.dx;
@@ -45,14 +43,28 @@ class Game {
             this.Player1.score = data.Player1.score;
             this.Player2.score = data.Player2.score;
         });
-        this.socket.on('DataToClient', (data) => {
+        this.socket.on('DataToClient', (data) =>
+        {
             console.log("data" + data);
-            this.Sender = data.username;
-            this.Client = this.socket.io.engine.id;
             this.Player1.y = data.Player1.y;
             this.Player1.x = data.Player1.x;
             this.Player2.x = data.Player2.x;
             this.Player2.y = data.Player2.y;
+
+        });
+
+        this.socket.on('connectClient', (data) =>
+        {
+            console.log("data " , data);
+            if(data.P1 !== "0" && data.P2 === "1")
+            {
+                window.alert("Player 1 Connected");
+            }
+            else if(data.P1 !== "0" && data.P2 !== "1")
+            {
+                window.alert("Both Players Connected");
+            }
+
 
         });
 
@@ -63,7 +75,7 @@ class Game {
         this.Bar = new Player(this.width / 2 - 5, this.height / 2 - 80, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
         this.Player1 = new Player(10, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
         this.Player2 = new Player(this.canvas.width - 20, (this.canvas.height - 80) / 2, 10, 80, "white", this.ctx, this.canvas, 0, "paddle.png");
-        this.ball = new Ball(this.canvas.width / 2, this.canvas.height / 2, 8, "white", this.ctx, this.canvas, this.Player1, this.Player2);
+        this.ball = new Ball(this.canvas.width / 2, this.canvas.height / 2, 8, "red", this.ctx, this.canvas, this.Player1, this.Player2);
         document.addEventListener("keydown", this.keyDownHandler.bind(this), false);
         document.addEventListener("keyup", this.keyUpHandler.bind(this), false);
         this.start();
@@ -144,7 +156,9 @@ class Game {
         }
     }
 
-    start() {
+    start() 
+    {
+        this.socket.emit('connectClient', window.sessionStorage.getItem("email"));
         this.update();
 
     }
@@ -166,8 +180,6 @@ class Game {
             // }
             // if (this.Sender.find(x => x === this.socket.io.engine.id))
                 this.ControleGame();
-            console.log("senders" + this.Sender);
-            console.log("clients" + this.Client);
             this.ball.move();
             this.ball.collision(this.Player1, this.Player2);
         }
@@ -196,7 +208,6 @@ class Game {
         if (!this.Pause) {
             this.center_line();
         }
-
         this.Player1.draw();
         this.Player2.draw();
         this.Bsocket.emit('DataToServer2', this.ToJson());
@@ -223,7 +234,7 @@ class Ball {
         this.x = x;
         this.y = y;
         this.radius = radius;
-        this.color = "rgb(" + Math.floor(Math.random() * 255 + 80) + "," + Math.floor(Math.random() * 255 + 80) + "," + 50 + Math.floor(Math.random() * 255 + 80) + ")";
+        this.color = color;
         this.speed = 1;
         this.ctx = ctx;;
         this.ballradius = radius;
@@ -346,7 +357,7 @@ class Player {
     constructor(x: number, y: number, width: number, height: number, color: string, ctx: CanvasRenderingContext2D, Canvas: HTMLCanvasElement, score: number, avatar: string) {
         this.x = x;
         this.y = y;
-        this.color = "rgb(" + Math.floor(Math.random() * 255 + 80) + "," + Math.floor(Math.random() * 255 + 80) + "," + 50 + Math.floor(Math.random() * 255 + 80) + ")";
+        this.color = color;//"rgb(" + Math.floor(Math.random() * 255 + 80) + "," + Math.floor(Math.random() * 255 + 80) + "," + 50 + Math.floor(Math.random() * 255 + 80) + ")";
         this.width = width;
         this.height = height;
         this.Canvas = Canvas;

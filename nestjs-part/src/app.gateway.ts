@@ -9,6 +9,8 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
   @WebSocketServer() server: Server;
   Players: any[] = [];
+  P1 : string = "0";
+  P2 : string = "1";
 
   afterInit(server: Server) {
     this.logger.log('Initialized');
@@ -29,14 +31,33 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 
   @SubscribeMessage('DataToServer')
-  handleMessage(client: Socket, payload: { username: any, data: any }): void {
-    payload.username = this.Players;
+  handleMessage(client: Socket, payload:any): void {
+    // payload = {P1: this.P1, P2: this.P2};
     client.broadcast.emit('DataToClient', payload);
   }
 
   @SubscribeMessage('DataToServer2')
-  handleBall(client: Socket, payload: { username: any, data: any }): void {
-    payload.username = this.Players;
+  handleBall(client: Socket,payload:any): void {
+    // payload = {players:{P1:this.P1,P2:this.P2},data}
     client.broadcast.emit('DataToClient2', payload);
+  }
+
+  @SubscribeMessage('connectServer')
+  connect_users(client: Socket, payload : any): void 
+  {
+    console.log(payload);
+    if(payload == "init" || (this.P1 != "0" && this.P2 != "1"))
+    {
+      return ;
+    }
+    if(this.P1 == "0" && this.P1 != this.P2)
+    {
+      this.P1 = payload;
+    } 
+    else if(this.P2 == "1" && this.P1 !== this.P2)
+    {
+      this.P2 = payload;
+    }
+    client.broadcast.emit('connectClient', {P1: this.P1, P2: this.P2});
   }
 }
