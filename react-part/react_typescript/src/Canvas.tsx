@@ -19,6 +19,9 @@ class Game {
     Bar: Player;
     socket: Socket;
     Bsocket: Socket;
+    Psocket: Socket;
+    P1: string = "";
+    P2: string = "";
 
     constructor(canvas: HTMLCanvasElement) {
 
@@ -27,14 +30,14 @@ class Game {
         this.width = this.canvas.width;
         this.height = this.canvas.height;
         //color: #0e101c;
-        this.color  = "#0e101c";
+        this.color = "#0e101c";
         this.Pause = false;
 
         this.canvas.style.backgroundColor = this.color;
-        this.socket = io('http://localhost:3600').connect();
-        this.Bsocket = io('http://localhost:3600');
-        this.Bsocket.on('DataToClient2', (data: any) => 
-        {
+        this.socket = io('http://10.12.10.1:3600').connect();
+        this.Bsocket = io('http://10.12.10.1:3600');
+        this.Psocket = io('http://10.12.10.1:3600');
+        this.Bsocket.on('DataToClient2', (data: any) => {
             this.ball.x = data.Ball.x;
             this.ball.y = data.Ball.y;
             this.ball.dx = data.Ball.dx;
@@ -43,30 +46,14 @@ class Game {
             this.Player1.score = data.Player1.score;
             this.Player2.score = data.Player2.score;
         });
-        this.socket.on('DataToClient', (data) =>
-        {
-            console.log("data" + data);
+        this.socket.on('DataToClient', (data) => {
             this.Player1.y = data.Player1.y;
             this.Player1.x = data.Player1.x;
             this.Player2.x = data.Player2.x;
             this.Player2.y = data.Player2.y;
-
         });
 
-        this.socket.on('connectClient', (data) =>
-        {
-            console.log("data " , data.P1, data.P2);
-            if(data.P1 !== "0" && data.P2 === "1")
-            {
-                window.alert("Player 1 Connected");
-            }
-            if(data.P1 !== "0" && data.P2 !== "1")
-            {
-                window.alert("Both Players Connected");
-            }
 
-
-        });
 
         this.Right_UpPressed = false;
         this.Right_DownPressed = false;
@@ -102,7 +89,7 @@ class Game {
 
 
     keyDownHandler(e: KeyboardEvent) {
-        if (e.key === "Up" || e.key === "ArrowUp") {
+        if ((e.key === "Up" || e.key === "ArrowUp")) {
             this.Right_UpPressed = true;
         }
         else if (e.key === "Down" || e.key === "ArrowDown") {
@@ -115,7 +102,7 @@ class Game {
         else if (e.key === "s" || e.key === "KeyS") {
             this.Left_DownPressed = true;
         }
-        if (e.key === "p" || e.key === "KeyP" || e.key === "P" || e.key === " " || e.key === "Space") {
+        if ((e.key === "p" || e.key === "KeyP" || e.key === "P" || e.key === " " || e.key === "Space") && this.P1 === window.sessionStorage.getItem("email")) {
             this.Pause = !this.Pause;
         }
     }
@@ -137,27 +124,33 @@ class Game {
     }
 
     ControleGame() {
-        if (this.Left_DownPressed) {
+        // console.log(window.sessionStorage.getItem("email"));
+        // alert(this.P1 +" "+ this.P2);
+        if (this.Left_DownPressed && this.P1 === window.sessionStorage.getItem("email")) {
             this.Player1.moveUp(4);
             this.socket.emit('DataToServer', this.ToJson());
         }
-        else if (this.Left_UpPressed) {
+        else if (this.Left_UpPressed && this.P1 === window.sessionStorage.getItem("email")) {
             this.Player1.moveDown(4);
             this.socket.emit('DataToServer', this.ToJson());
         }
 
-        if (this.Right_DownPressed) {
+        if (this.Right_DownPressed && this.P2 === window.sessionStorage.getItem("email")) {
             this.Player2.moveUp(4);
             this.socket.emit('DataToServer', this.ToJson());
         }
-        else if (this.Right_UpPressed) {
+        else if (this.Right_UpPressed && this.P2 === window.sessionStorage.getItem("email")) {
             this.Player2.moveDown(4);
             this.socket.emit('DataToServer', this.ToJson());
         }
     }
 
-    start() 
-    {
+    start() {
+        this.Psocket.on('connectClient', (data) => {
+            this.P1 = data.P1;
+            this.P2 = data.P2;
+        });
+
         this.update();
 
     }
@@ -169,23 +162,31 @@ class Game {
 
 
     update() {
+        // set interval for update connection to server and send data to server
+        // setInterval(() => {
+        // }, 1000 / 60);  
+        this.socket.emit('connectServer', "init");
+        console.log("ConnectFromServer : " + this.P1 + " " + this.P2);
+
         this.clear();
         this.show_score();  // show score
         this.draw();
-        this.socket.emit('connectClient', "init");
 
         if (!this.Pause) {
             this.random_bar();
             // if (this.Sender.length === 0) {
-                // this.socket.emit('DataToServer', this.ToJson());
+            // this.socket.emit('DataToServer', this.ToJson());
             // }
             // if (this.Sender.find(x => x === this.socket.io.engine.id))
-                this.ControleGame();
-            this.ball.move();
-            this.ball.collision(this.Player1, this.Player2);
+            this.ControleGame();
+            // if (this.P1 === window.sessionStorage.getItem("email")) {
+                this.ball.move();
+            // }
+                this.ball.collision(this.Player1, this.Player2);
         }
         else
             this.paused();
+
         requestAnimationFrame(() => this.update());
 
     }

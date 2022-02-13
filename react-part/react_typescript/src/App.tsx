@@ -38,11 +38,8 @@ export default function App() {
     );
   }
 
-  let T
-
   //initial WebSocketServer 
   const socket = io('http://localhost:3600');
-  // console.log(window.sessionStorage.getItem("email"));
 
   const onSubmit: SubmitHandler<FormValues> = (data: any) => {
     window.sessionStorage.setItem("email", data.email);
