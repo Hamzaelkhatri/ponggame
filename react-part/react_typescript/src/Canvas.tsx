@@ -146,7 +146,8 @@ class Game {
     }
 
     start() {
-        this.Psocket.on('connectClient', (data) => {
+        this.Psocket.on('connectClient', (data) =>
+         {
             this.P1 = data.P1;
             this.P2 = data.P2;
         });
@@ -180,7 +181,7 @@ class Game {
             // if (this.Sender.find(x => x === this.socket.io.engine.id))
             this.ControleGame();
             // if (this.P1 === window.sessionStorage.getItem("email")) {
-                this.ball.move();
+            this.ball.move();
             // }
                 this.ball.collision(this.Player1, this.Player2);
         }
@@ -212,7 +213,8 @@ class Game {
         }
         this.Player1.draw();
         this.Player2.draw();
-        this.Bsocket.emit('DataToServer2', this.ToJson());
+        if(this.P1 === window.sessionStorage.getItem("email"))
+            this.Bsocket.emit('DataToServer2', this.ToJson());
         this.ball.draw();
     }
 
