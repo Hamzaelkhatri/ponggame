@@ -53,18 +53,17 @@ class Game {
 
     count_time() {
         //set data from json
-        if (JSON.parse(this.json)[this.time].Ball != null)
-            this.ball.FromJson(JSON.parse(this.json)[this.time].Ball);
-        if (JSON.parse(this.json)[this.time].Player1 != null)
-            this.Player1.FromJson(JSON.parse(this.json)[this.time].Player1);
-        if (JSON.parse(this.json)[this.time].Player2 != null)
-            this.Player2.FromJson(JSON.parse(this.json)[this.time].Player2);
-        // this.dto.CreateJson(this.time);
-        this.time++;
-
-        if (this.Player1.Score == 10 || this.Player2.Score == 10) {
+        if (this.Player1.Score == 2 || this.Player2.Score == 2 || JSON.parse(this.json)[this.time] == undefined) {
             clearTimeout(this.int);
+            return;
         }
+        if (JSON.parse(this.json)[this.time] != undefined) {
+            this.ball.FromJson(JSON.parse(this.json)[this.time].Ball);
+            this.Player1.FromJson(JSON.parse(this.json)[this.time].Player1);
+            this.Player2.FromJson(JSON.parse(this.json)[this.time].Player2);
+        }
+        this.time++;
+        console.log(JSON.parse(this.json)[this.time]);
         this.int = setTimeout(this.count_time.bind(this), 60);
 
     }
