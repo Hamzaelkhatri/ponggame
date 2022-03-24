@@ -5,6 +5,7 @@ class Game {
         this.width = this.canvas.width;
         this.height = this.canvas.height;
         this.color = "rgb(44, 44, 84)";
+        this.time = 0;
         this.canvas.style.backgroundColor = this.color;
         this.Right_UpPressed = false;
         this.Right_DownPressed = false;
@@ -18,7 +19,22 @@ class Game {
         this.ball = new Ball(this.canvas.width / 2, this.canvas.height / 2, 6, "white", this.ctx, this.canvas, this.Player1, this.Player2);
         document.addEventListener("keydown", this.keyDownHandler.bind(this), false);
         document.addEventListener("keyup", this.keyUpHandler.bind(this), false);
+        this.dto = new DTO(this.Player1, this.Player2, this.ball, this.time);
+        this.count_time();
         this.start();
+    }
+    count_time() {
+        this.time++;
+        this.dto.CreateJson(this.time);
+        if (this.Player1.Score == 10 || this.Player2.Score == 10) {
+            clearTimeout(this.int);
+        }
+        this.int = setTimeout(this.count_time.bind(this), 1000);
+    }
+    show_time() {
+        this.ctx.font = "30px Arial";
+        this.ctx.fillStyle = "white";
+        this.ctx.fillText("Time: " + this.time, this.canvas.width / 2 - 50, this.canvas.height / 2 - 50);
     }
     show_score() {
         this.ctx.font = "16px Arial";
@@ -86,16 +102,19 @@ class Game {
             this.ControleGame();
             this.ball.move();
             this.ball.collision(this.Player1, this.Player2);
-            // this.ball.bot(this.Player1);
         }
-        else
+        else {
             this.paused();
-        // this.bar_y += (Math.floor(Math.random() * 40)) - 40;
-        // if (this.bar_y > this.canvas.height - 80)
-        //     this.bar_y = this.canvas.height - 80;
-        // if (this.bar_y < 0)
-        //     this.bar_y = 0;
-        requestAnimationFrame(() => this.update());
+        }
+        if (this.Player1.Score == 3 || this.Player2.Score == 3) {
+            this.ctx.font = "30px Arial";
+            this.ctx.fillStyle = "white";
+            this.ctx.fillText("Game Over", this.canvas.width / 2 - 50, this.canvas.height / 2 - 50);
+            console.log(this.dto.GetJson());
+        }
+        else {
+            requestAnimationFrame(() => this.update());
+        }
     }
     clear() {
         this.ctx.clearRect(0, 0, this.width, this.height);
@@ -113,10 +132,40 @@ class Game {
         if (!this.Pause) {
             this.center_line();
         }
+        this.show_time();
         this.Player1.draw();
         this.Player2.draw();
         this.Bar.draw();
         this.ball.draw();
+    }
+}
+class DTO {
+    constructor(Player1, Player2, Ball, Time) {
+        this.Player1 = Player1;
+        this.Player2 = Player2;
+        this.Ball = Ball;
+        this.Time = Time;
+        this.json = "[";
+    }
+    CreateJson(time) {
+        this.json += "{";
+        this.json += '"Time":' + time + ',';
+        this.json += '"Player1":';
+        this.json += this.Player1.Json();
+        this.json += ',';
+        this.json += '"Player2":';
+        this.json += this.Player2.Json();
+        this.json += ',';
+        this.json += '"Ball":';
+        this.json += this.Ball.Json();
+        this.json += '},\n';
+    }
+    GetJson() {
+        //delete last comma
+        this.json = this.json.substring(0, this.json.length - 2);
+        this.json += "]";
+        document.body.innerHTML = this.json;
+        return this.json;
     }
 }
 class Ball {
@@ -214,6 +263,19 @@ class Ball {
         this.ctx.fill();
         this.ctx.closePath();
     }
+    Json() {
+        this.json = '{';
+        this.json += '"x": ' + this.x + ',';
+        this.json += '"y": ' + this.y + ',';
+        this.json += '"radius": ' + this.radius + ',';
+        this.json += '"color": "' + this.color + '",';
+        this.json += '"speed": ' + this.speed + ',';
+        this.json += '"dx": ' + this.dx + ',';
+        this.json += '"dy": ' + this.dy + ',';
+        this.json += '"ballradius": ' + this.ballradius;
+        this.json += '}';
+        return this.json;
+    }
 }
 class Player {
     constructor(x, y, width, height, color, ctx, Canvas, score, avatar) {
@@ -270,6 +332,9 @@ class Player {
         if (this.y < 0) {
             this.y = 0;
         }
+    }
+    Json() {
+        return JSON.stringify(this);
     }
 }
 var game = new Game();
